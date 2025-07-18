@@ -615,9 +615,27 @@ fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/search?brand=${encodeURIComponent
     fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/ID/${matchId}?sheet=car_database`, {
       method: 'DELETE'
     }).then(() => {
+      const car = carData[index];
+fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/search?brand=${encodeURIComponent(car.brand)}&detail=${encodeURIComponent(car.detail)}&year=${encodeURIComponent(car.year)}&price=${car.price}`, {
+  method: 'GET'
+})
+.then(res => res.json())
+.then(matches => {
+  if (matches.length > 0) {
+    const matchId = matches[0].ID || matches[0].id || matches[0]._id;
+    fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/ID/${matchId}?sheet=car_database`, {
+      method: 'DELETE'
+    }).then(() => {
       carData.splice(index, 1);
       populateCarTable();
       saveDataToLocalStorage();
+      alert("Car deleted from database");
+    });
+  } else {
+    alert("Car not found in SheetDB");
+  }
+});
+
       alert("Car deleted from database");
     });
   } else {
