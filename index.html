@@ -1,30 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Collection Inventory Fee Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
   <script defer src="script.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            kreditplus: {
-              yellow: '#FFD100',
-              orange: '#FF8C00',
-              lightorange: '#FFA500',
-              darkorange: '#FF6B00',
-            },
-          },
-        },
-      },
-    };
-  </script>
 </head>
-<body class="bg-gray-100 min-h-screen">
-  <!-- HTML content remains unchanged, only scripts were moved to script.js -->
+<body class="bg-gray-100">
+  <nav class="bg-white shadow p-4 flex justify-between items-center">
+    <div class="font-bold text-xl">Inventory Fee</div>
+    <div class="hidden md:flex gap-4">
+      <a href="#" id="calculatorLink" class="text-blue-600 hover:underline">Calculator</a>
+      <a href="#" id="carDatabaseLink" class="text-blue-600 hover:underline">Car Database</a>
+      <a href="#" id="manageDataLink" class="text-blue-600 hover:underline">Manage Data</a>
+      <a href="#" id="adjustmentRateLink" class="text-blue-600 hover:underline">Adjust Rate</a>
+    </div>
+    <button id="mobileMenuButton" class="md:hidden">☰</button>
+  </nav>
+  <div id="mobileMenu" class="hidden md:hidden p-4 space-y-2">
+    <a href="#" class="mobile-nav block text-blue-600" data-target="calculator">Calculator</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="carDatabase">Car Database</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="manageData">Manage Data</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="adjustmentRate">Adjust Rate</a>
+  </div>
+
+  <main class="p-4">
+    <!-- Calculator Page -->
+    <section id="calculator" class="page">
+      <h1 class="text-xl font-bold mb-4">Fee Calculator</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input id="brand" type="text" placeholder="Brand" class="border p-2">
+        <input id="detail" type="text" placeholder="Detail" class="border p-2">
+        <input id="year" type="text" placeholder="Year" class="border p-2">
+        <label class="flex items-center space-x-2">
+          <input id="useEstimation" type="checkbox">
+          <span>Use Estimation</span>
+        </label>
+        <input id="estimationPrice" type="number" placeholder="Estimation Price" class="border p-2">
+        <button id="calculateButton" class="bg-blue-600 text-white px-4 py-2">Calculate</button>
+      </div>
+      <div id="result" class="mt-4">
+        <h2 class="text-lg font-semibold">Result:</h2>
+        <p id="resultCar"></p>
+        <p id="resultPrice"></p>
+        <p id="resultFeeRate"></p>
+        <p id="resultConditionRate"></p>
+        <p id="resultFinalFee"></p>
+      </div>
+      <div id="estimationResult" class="mt-4 hidden">
+        <h2 class="text-lg font-semibold">Estimation:</h2>
+        <p id="estResultPrice"></p>
+        <p id="estResultFeeRate"></p>
+        <p id="estResultConditionRate"></p>
+        <p id="estResultFinalFee"></p>
+      </div>
+    </section>
+
+    <!-- Car Database Page -->
+    <section id="carDatabase" class="page hidden">
+      <h1 class="text-xl font-bold mb-4">Car Database <span id="totalCarsPublic"></span></h1>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
+        <input id="filterBrand" type="text" placeholder="Filter by brand" class="border p-2">
+        <input id="filterDetail" type="text" placeholder="Filter by detail" class="border p-2">
+        <input id="filterYear" type="text" placeholder="Filter by year" class="border p-2">
+      </div>
+      <table class="w-full border">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border px-4 py-2">Brand</th>
+            <th class="border px-4 py-2">Detail</th>
+            <th class="border px-4 py-2">Year</th>
+          </tr>
+        </thead>
+        <tbody id="publicCarTableBody"></tbody>
+      </table>
+      <p id="noResultsMessage" class="hidden text-red-600 mt-2">No matching results.</p>
+    </section>
+
+    <!-- Manage Data Page -->
+    <section id="manageData" class="page hidden">
+      <div id="adminLoginOverlay" class="bg-white p-4 shadow">
+        <h2 class="font-bold mb-2">Admin Login</h2>
+        <input id="adminLoginPassword" type="password" placeholder="Password" class="border p-2 w-full mb-2">
+        <div class="flex gap-2">
+          <button id="adminLoginButton" class="bg-green-500 text-white px-4 py-2">Login</button>
+          <button id="adminLoginCancelButton" class="bg-gray-500 text-white px-4 py-2">Cancel</button>
+        </div>
+      </div>
+      <div id="manageDataContent" class="hidden">
+        <h1 class="text-xl font-bold mb-4">Manage Car Database <span id="totalCarsAdmin"></span></h1>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
+          <input id="newBrand" type="text" placeholder="Brand" class="border p-2">
+          <input id="newDetail" type="text" placeholder="Detail" class="border p-2">
+          <input id="newYear" type="text" placeholder="Year" class="border p-2">
+          <input id="newPrice" type="number" placeholder="Price" class="border p-2">
+        </div>
+        <button id="addCarButton" class="bg-blue-600 text-white px-4 py-2 mb-4">Add Car</button>
+        <table class="w-full border">
+          <thead>
+            <tr class="bg-gray-200">
+              <th class="border px-4 py-2">Brand</th>
+              <th class="border px-4 py-2">Detail</th>
+              <th class="border px-4 py-2">Year</th>
+              <th class="border px-4 py-2">Action</th>
+            </tr>
+          </thead>
+          <tbody id="carTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Adjustment Rate Page -->
+    <section id="adjustmentRate" class="page hidden">
+      <h1 class="text-xl font-bold mb-4">Adjustment Rate</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h2 class="font-semibold mb-2">Fee Rate <span id="currentFeeRate">5%</span></h2>
+          <input id="newFeeRate" type="number" class="border p-2 w-full" placeholder="New Fee Rate">
+          <input id="adminPassword" type="password" class="border p-2 w-full mt-1" placeholder="Admin Password">
+          <button id="updateFeeRateButton" class="bg-blue-600 text-white px-4 py-2 mt-2">Update Fee Rate</button>
+        </div>
+        <div>
+          <h2 class="font-semibold mb-2">Tax Reduction Rate <span id="currentConditionRate">10%</span></h2>
+          <input id="newConditionRate" type="number" class="border p-2 w-full" placeholder="New Reduction Rate">
+          <input id="assetPassword" type="password" class="border p-2 w-full mt-1" placeholder="Asset Password">
+          <button id="updateConditionRateButton" class="bg-blue-600 text-white px-4 py-2 mt-2">Update Condition Rate</button>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
