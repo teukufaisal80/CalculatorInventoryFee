@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Collection Inventory Fee Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Fee Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
   <script defer src="script.js"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-gray-900">
+
+  <!-- Navigation -->
   <nav class="bg-white shadow p-4 flex justify-between items-center">
     <div class="font-bold text-xl">Inventory Fee</div>
     <div class="hidden md:flex gap-4">
       <a href="#" id="calculatorLink" class="text-blue-600 hover:underline">Calculator</a>
-      <a href="#" id="carDatabaseLink" class="text-blue-600 hover:underline">Car Database</a>
-      <a href="#" id="manageDataLink" class="text-blue-600 hover:underline">Manage Data</a>
-      <a href="#" id="adjustmentRateLink" class="text-blue-600 hover:underline">Adjust Rate</a>
+      <a href="#" id="carDatabaseLink" class="text-blue-600 hover:underline">Database</a>
+      <a href="#" id="manageDataLink" class="text-blue-600 hover:underline">Manage</a>
+      <a href="#" id="adjustmentRateLink" class="text-blue-600 hover:underline">Rates</a>
     </div>
     <button id="mobileMenuButton" class="md:hidden">☰</button>
   </nav>
+
+  <!-- Mobile Menu -->
   <div id="mobileMenu" class="hidden md:hidden p-4 space-y-2">
     <a href="#" class="mobile-nav block text-blue-600" data-target="calculator">Calculator</a>
-    <a href="#" class="mobile-nav block text-blue-600" data-target="carDatabase">Car Database</a>
-    <a href="#" class="mobile-nav block text-blue-600" data-target="manageData">Manage Data</a>
-    <a href="#" class="mobile-nav block text-blue-600" data-target="adjustmentRate">Adjust Rate</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="carDatabase">Database</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="manageData">Manage</a>
+    <a href="#" class="mobile-nav block text-blue-600" data-target="adjustmentRate">Rates</a>
   </div>
 
-  <main class="p-4">
+  <main class="p-4 space-y-12">
+
     <!-- Calculator Page -->
     <section id="calculator" class="page">
       <h1 class="text-xl font-bold mb-4">Fee Calculator</h1>
@@ -41,20 +46,22 @@
         <input id="estimationPrice" type="number" placeholder="Estimation Price" class="border p-2">
         <button id="calculateButton" class="bg-blue-600 text-white px-4 py-2">Calculate</button>
       </div>
+
       <div id="result" class="mt-4">
         <h2 class="text-lg font-semibold">Result:</h2>
-        <p id="resultCar"></p>
-        <p id="resultPrice"></p>
-        <p id="resultFeeRate"></p>
-        <p id="resultConditionRate"></p>
-        <p id="resultFinalFee"></p>
+        <p>Car: <span id="resultCar"></span></p>
+        <p>Price: <span id="resultPrice"></span></p>
+        <p>Fee Rate: <span id="resultFeeRate"></span></p>
+        <p>Condition Rate: <span id="resultConditionRate"></span></p>
+        <p>Final Fee: <span id="resultFinalFee"></span></p>
       </div>
+
       <div id="estimationResult" class="mt-4 hidden">
         <h2 class="text-lg font-semibold">Estimation:</h2>
-        <p id="estResultPrice"></p>
-        <p id="estResultFeeRate"></p>
-        <p id="estResultConditionRate"></p>
-        <p id="estResultFinalFee"></p>
+        <p>Est. Price: <span id="estResultPrice"></span></p>
+        <p>Fee Rate: <span id="estResultFeeRate"></span></p>
+        <p>Condition Rate: <span id="estResultConditionRate"></span></p>
+        <p>Final Fee: <span id="estResultFinalFee"></span></p>
       </div>
     </section>
 
@@ -89,6 +96,7 @@
           <button id="adminLoginCancelButton" class="bg-gray-500 text-white px-4 py-2">Cancel</button>
         </div>
       </div>
+
       <div id="manageDataContent" class="hidden">
         <h1 class="text-xl font-bold mb-4">Manage Car Database <span id="totalCarsAdmin"></span></h1>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-4">
@@ -97,7 +105,10 @@
           <input id="newYear" type="text" placeholder="Year" class="border p-2">
           <input id="newPrice" type="number" placeholder="Price" class="border p-2">
         </div>
-        <button id="addCarButton" class="bg-blue-600 text-white px-4 py-2 mb-4">Add Car</button>
+        <div class="flex flex-wrap items-center gap-4 mb-4">
+          <button id="addCarButton" class="bg-blue-600 text-white px-4 py-2">Add Car</button>
+          <button id="deleteAllCarsButton" class="bg-red-600 text-white px-4 py-2">Delete All Cars</button>
+        </div>
         <table class="w-full border">
           <thead>
             <tr class="bg-gray-200">
@@ -130,6 +141,7 @@
         </div>
       </div>
     </section>
+
   </main>
 </body>
 </html>
