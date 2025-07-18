@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -404,7 +405,7 @@
 
     <footer class="bg-gray-800 text-white py-4 mt-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <p class="text-center">© 2025 Kreditplus. All rights reserved.</p>
+            <p class="text-center">ï¿½ 2025 Kreditplus. All rights reserved.</p>
         </div>
     </footer>
 
@@ -603,9 +604,27 @@
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const index = parseInt(this.dataset.index);
-                    carData.splice(index, 1);
-                    populateCarTable();
-                    saveDataToLocalStorage(); // Save after deletion
+                    const car = carData[index]; // get the car object to delete
+fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/search?brand=${encodeURIComponent(car.brand)}&detail=${encodeURIComponent(car.detail)}&year=${encodeURIComponent(car.year)}&price=${car.price}`, {
+  method: 'GET'
+})
+.then(res => res.json())
+.then(matches => {
+  if (matches.length > 0) {
+    const matchId = matches[0].id || matches[0].ID || matches[0]._id;
+    fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/ID/${matchId}?sheet=car_database`, {
+      method: 'DELETE'
+    }).then(() => {
+      carData.splice(index, 1);
+      populateCarTable();
+      saveDataToLocalStorage();
+      alert("Car deleted from database");
+    });
+  } else {
+    alert("Car not found in SheetDB");
+  }
+});
+ // Save after deletion
                 });
             });
             
