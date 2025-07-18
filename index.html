@@ -237,7 +237,6 @@
                                     <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
                                     <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car Detail</th>
                                     <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (Rp)</th>
                                     <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
@@ -422,19 +421,7 @@
         }
         
         // Sample car data
-        let carData = [
-            { brand: "Toyota", detail: "Avanza G MT 1.3", year: "2020", price: 180000000 },
-            { brand: "Toyota", detail: "Innova V AT 2.4", year: "2019", price: 280000000 },
-            { brand: "Honda", detail: "Jazz RS MT 1.5", year: "2018", price: 190000000 },
-            { brand: "Honda", detail: "Brio RS CVT 1.2", year: "2021", price: 160000000 },
-            { brand: "Daihatsu", detail: "Xenia R MT 1.3", year: "2020", price: 170000000 },
-            { brand: "Suzuki", detail: "Ertiga GX AT 1.5", year: "2019", price: 185000000 },
-            { brand: "Mitsubishi", detail: "Xpander Ultimate AT 1.5", year: "2021", price: 240000000 },
-            { brand: "Nissan", detail: "Livina VL AT 1.5", year: "2020", price: 210000000 },
-            { brand: "Toyota", detail: "Rush G MT 1.5", year: "2021", price: 230000000 },
-            { brand: "Daihatsu", detail: "Terios R AT 1.5", year: "2020", price: 210000000 }
-        ];
-
+       let carData = []; // Will be loaded from SheetDB only
         // Adjustment rates
         let feeRate = 5; // 5%
         let conditionRate = 10; // 10% (Taxation Decrease Rate)
