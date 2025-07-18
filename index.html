@@ -1,0 +1,1131 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collection Inventory Fee Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kreditplus: {
+                            yellow: '#FFD100',
+                            orange: '#FF8C00',
+                            lightorange: '#FFA500',
+                            darkorange: '#FF6B00',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-gradient-to-r from-kreditplus-yellow to-kreditplus-orange shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-white">Kreditplus</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#" class="text-white hover:bg-kreditplus-darkorange px-3 py-2 rounded-md text-sm font-medium" id="calculatorLink">Calculator</a>
+                            <a href="#" class="text-white hover:bg-kreditplus-darkorange px-3 py-2 rounded-md text-sm font-medium" id="carDatabaseLink">Car Database</a>
+                            <a href="#" class="text-white hover:bg-kreditplus-darkorange px-3 py-2 rounded-md text-sm font-medium" id="manageDataLink">Manage Data</a>
+                            <a href="#" class="text-white hover:bg-kreditplus-darkorange px-3 py-2 rounded-md text-sm font-medium" id="adjustmentRateLink">Adjustment Rate</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button id="mobileMenuButton" class="inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-kreditplus-darkorange focus:outline-none">
+                        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="hidden md:hidden" id="mobileMenu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#" class="text-white hover:bg-kreditplus-darkorange block px-3 py-2 rounded-md text-base font-medium mobile-nav" data-target="calculator">Calculator</a>
+                <a href="#" class="text-white hover:bg-kreditplus-darkorange block px-3 py-2 rounded-md text-base font-medium mobile-nav" data-target="carDatabase">Car Database</a>
+                <a href="#" class="text-white hover:bg-kreditplus-darkorange block px-3 py-2 rounded-md text-base font-medium mobile-nav" data-target="manageData">Manage Data</a>
+                <a href="#" class="text-white hover:bg-kreditplus-darkorange block px-3 py-2 rounded-md text-base font-medium mobile-nav" data-target="adjustmentRate">Adjustment Rate</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Calculator Page -->
+    <div id="calculator" class="page max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Collection Inventory Fee Calculator</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Car Selection</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="brand">
+                            Brand
+                        </label>
+                        <div class="relative">
+                            <input id="brand" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Select or type car brand" onclick="showSuggestions(this, brandSuggestions, 'brand')">
+                            <div id="brandSuggestions" class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden smooth-scroll"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="detail">
+                            Car Detail
+                        </label>
+                        <div class="relative">
+                            <input id="detail" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Select or type car detail" onclick="showSuggestions(this, detailSuggestions, 'detail')">
+                            <div id="detailSuggestions" class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden smooth-scroll"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="year">
+                            Year
+                        </label>
+                        <div class="relative">
+                            <input id="year" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Select or type year" onclick="showSuggestions(this, yearSuggestions, 'year')">
+                            <div id="yearSuggestions" class="absolute z-10 bg-white border border-gray-300 w-full mt-1 rounded-md shadow-lg max-h-60 overflow-y-auto hidden smooth-scroll"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            Use Estimation Price?
+                        </label>
+                        <div class="flex items-center mb-2">
+                            <input id="useEstimation" type="checkbox" class="h-5 w-5 text-kreditplus-orange focus:ring-kreditplus-orange border-gray-300 rounded">
+                            <label for="useEstimation" class="ml-2 block text-sm text-gray-700">
+                                Yes, I want to use my own price estimation
+                            </label>
+                        </div>
+                        <div id="estimationPriceContainer" class="hidden">
+                            <input id="estimationPrice" type="number" inputmode="numeric" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter estimation price in Rupiah">
+                        </div>
+                    </div>
+                    
+                    <button id="calculateButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline w-full text-lg">
+                        Calculate Fee
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Results</h2>
+                    
+                    <div id="databaseResult" class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Based on Database</h3>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="text-gray-600">Car:</div>
+                                <div id="resultCar" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600">Database Price:</div>
+                                <div id="resultPrice" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600">Fee Rate:</div>
+                                <div id="resultFeeRate" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600">Taxation Decrease Rate:</div>
+                                <div id="resultConditionRate" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600 font-bold">Final Fee:</div>
+                                <div id="resultFinalFee" class="font-bold text-kreditplus-darkorange">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="estimationResult" class="mb-6 hidden">
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Based on Estimation</h3>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div class="text-gray-600">Estimation Price:</div>
+                                <div id="estResultPrice" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600">Fee Rate:</div>
+                                <div id="estResultFeeRate" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600">Taxation Decrease Rate:</div>
+                                <div id="estResultConditionRate" class="font-medium">-</div>
+                                
+                                <div class="text-gray-600 font-bold">Final Fee:</div>
+                                <div id="estResultFinalFee" class="font-bold text-kreditplus-darkorange">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Data Page -->
+    <div id="manageData" class="page max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 hidden">
+        <!-- Admin Login Overlay -->
+        <div id="adminLoginOverlay" class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Login Required</h1>
+            <p class="mb-4 text-gray-600">Please enter the admin password to access the Manage Data section.</p>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="adminLoginPassword">
+                    Admin Password
+                </label>
+                <input id="adminLoginPassword" type="password" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Enter admin password">
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-4">
+                <button id="adminLoginButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Login
+                </button>
+                <button id="adminLoginCancelButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Cancel
+                </button>
+            </div>
+        </div>
+        
+        <!-- Manage Data Content (Hidden until logged in) -->
+        <div id="manageDataContent" class="hidden">
+            <div class="bg-white shadow-lg rounded-lg p-6">
+                <h1 class="text-2xl font-bold text-gray-800 mb-6">Manage Car Data</h1>
+                
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Import Data</h2>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p class="mb-4 text-gray-600">Upload Excel file with the following format:</p>
+                        <ul class="list-disc pl-5 mb-4 text-gray-600">
+                            <li>Column A: Brand</li>
+                            <li>Column B: Car Detail (example: Avanza G MT 1.3, Innova V AT 2.4, etc)</li>
+                            <li>Column C: Year</li>
+                            <li>Column D: Price (in Rupiah)</li>
+                        </ul>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="file" id="fileInput" accept=".xlsx, .xls" class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-kreditplus-yellow file:text-gray-700
+                                hover:file:bg-kreditplus-orange hover:file:text-white">
+                            <button id="importButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                                Import Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-700">Car Database <span id="totalCarsAdmin" class="text-sm font-normal text-gray-500"></span></h2>
+                        <button id="exportButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Export to Excel
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car Detail</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (Rp)</th>
+                                    <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="carTableBody">
+                                <!-- Data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Add New Car</h2>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="newBrand">
+                                    Brand
+                                </label>
+                                <input id="newBrand" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="newDetail">
+                                    Car Detail
+                                </label>
+                                <input id="newDetail" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Example: Avanza G MT 1.3">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="newYear">
+                                    Year
+                                </label>
+                                <input id="newYear" type="text" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="newPrice">
+                                    Price (Rp)
+                                </label>
+                                <input id="newPrice" type="number" inputmode="numeric" class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <button id="addCarButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline w-full md:w-auto">
+                                Add Car
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Car Database Page -->
+    <div id="carDatabase" class="page max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 hidden">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Car Database</h1>
+            
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-700">Available Cars <span id="totalCarsPublic" class="text-sm font-normal text-gray-500"></span></h2>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="filterBrand">
+                                Filter by Brand
+                            </label>
+                            <input id="filterBrand" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Type to filter brands">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="filterDetail">
+                                Filter by Car Detail
+                            </label>
+                            <input id="filterDetail" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Type to filter car details">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2" for="filterYear">
+                                Filter by Year
+                            </label>
+                            <input id="filterYear" type="text" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Type to filter years">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button id="resetFilterButton" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Reset Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th>
+                                <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car Detail</th>
+                                <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
+                                <th class="px-4 py-2 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price (Rp)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicCarTableBody">
+                            <!-- Data will be populated here -->
+                        </tbody>
+                    </table>
+                    <div id="noResultsMessage" class="hidden py-4 text-center text-gray-500">
+                        No cars match your filter criteria
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Adjustment Rate Page -->
+    <div id="adjustmentRate" class="page max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 hidden">
+        <div class="bg-white shadow-lg rounded-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">Adjustment Rate Settings</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Fee Adjustment Rate</h2>
+                    <p class="text-gray-600 mb-4">Current Fee Rate: <span id="currentFeeRate" class="font-bold">5%</span></p>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="newFeeRate">
+                            New Fee Rate (%)
+                        </label>
+                        <input id="newFeeRate" type="number" min="0" max="100" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="adminPassword">
+                            Admin Password
+                        </label>
+                        <input id="adminPassword" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <button id="updateFeeRateButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                        Update Fee Rate
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Taxation Decrease Rate</h2>
+                    <p class="text-gray-600 mb-4">Current Taxation Rate: <span id="currentConditionRate" class="font-bold">10%</span></p>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="newConditionRate">
+                            New Taxation Rate (%)
+                        </label>
+                        <input id="newConditionRate" type="number" min="0" max="100" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="assetPassword">
+                            Asset Management Password
+                        </label>
+                        <input id="assetPassword" type="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    
+                    <button id="updateConditionRateButton" class="bg-kreditplus-orange hover:bg-kreditplus-darkorange text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
+                        Update Taxation Rate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-white py-4 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center">© 2025 Kreditplus. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Check for service worker support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        
+        // Sample car data
+        let carData = [
+            { brand: "Toyota", detail: "Avanza G MT 1.3", year: "2020", price: 180000000 },
+            { brand: "Toyota", detail: "Innova V AT 2.4", year: "2019", price: 280000000 },
+            { brand: "Honda", detail: "Jazz RS MT 1.5", year: "2018", price: 190000000 },
+            { brand: "Honda", detail: "Brio RS CVT 1.2", year: "2021", price: 160000000 },
+            { brand: "Daihatsu", detail: "Xenia R MT 1.3", year: "2020", price: 170000000 },
+            { brand: "Suzuki", detail: "Ertiga GX AT 1.5", year: "2019", price: 185000000 },
+            { brand: "Mitsubishi", detail: "Xpander Ultimate AT 1.5", year: "2021", price: 240000000 },
+            { brand: "Nissan", detail: "Livina VL AT 1.5", year: "2020", price: 210000000 },
+            { brand: "Toyota", detail: "Rush G MT 1.5", year: "2021", price: 230000000 },
+            { brand: "Daihatsu", detail: "Terios R AT 1.5", year: "2020", price: 210000000 }
+        ];
+
+        // Adjustment rates
+        let feeRate = 5; // 5%
+        let conditionRate = 10; // 10% (Taxation Decrease Rate)
+
+        // DOM Elements
+        const mobileMenuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const calculatorLink = document.getElementById('calculatorLink');
+        const manageDataLink = document.getElementById('manageDataLink');
+        const adjustmentRateLink = document.getElementById('adjustmentRateLink');
+        const mobileNavLinks = document.querySelectorAll('.mobile-nav');
+        
+        const calculatorPage = document.getElementById('calculator');
+        const manageDataPage = document.getElementById('manageData');
+        const adjustmentRatePage = document.getElementById('adjustmentRate');
+        
+        const brandInput = document.getElementById('brand');
+        const detailInput = document.getElementById('detail');
+        const yearInput = document.getElementById('year');
+        const estimationPriceInput = document.getElementById('estimationPrice');
+        const calculateButton = document.getElementById('calculateButton');
+        
+        const brandSuggestions = document.getElementById('brandSuggestions');
+        const detailSuggestions = document.getElementById('detailSuggestions');
+        const yearSuggestions = document.getElementById('yearSuggestions');
+        
+        const resultCar = document.getElementById('resultCar');
+        const resultPrice = document.getElementById('resultPrice');
+        const resultFeeRate = document.getElementById('resultFeeRate');
+        const resultConditionRate = document.getElementById('resultConditionRate');
+        const resultFinalFee = document.getElementById('resultFinalFee');
+        
+        const estimationResult = document.getElementById('estimationResult');
+        const estResultPrice = document.getElementById('estResultPrice');
+        const estResultFeeRate = document.getElementById('estResultFeeRate');
+        const estResultConditionRate = document.getElementById('estResultConditionRate');
+        const estResultFinalFee = document.getElementById('estResultFinalFee');
+        
+        const fileInput = document.getElementById('fileInput');
+        const importButton = document.getElementById('importButton');
+        const exportButton = document.getElementById('exportButton');
+        const carTableBody = document.getElementById('carTableBody');
+        
+        const newBrand = document.getElementById('newBrand');
+        const newDetail = document.getElementById('newDetail');
+        const newYear = document.getElementById('newYear');
+        const newPrice = document.getElementById('newPrice');
+        const addCarButton = document.getElementById('addCarButton');
+        
+        const currentFeeRate = document.getElementById('currentFeeRate');
+        const newFeeRate = document.getElementById('newFeeRate');
+        const adminPassword = document.getElementById('adminPassword');
+        const updateFeeRateButton = document.getElementById('updateFeeRateButton');
+        
+        const currentConditionRate = document.getElementById('currentConditionRate');
+        const newConditionRate = document.getElementById('newConditionRate');
+        const assetPassword = document.getElementById('assetPassword');
+        const updateConditionRateButton = document.getElementById('updateConditionRateButton');
+
+        // Mobile menu toggle
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Navigation
+        function showPage(pageId) {
+            // Make sure the page exists
+            const targetPage = document.getElementById(pageId);
+            if (!targetPage) {
+                console.error(`Page with ID "${pageId}" not found`);
+                return;
+            }
+            
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // Show the target page
+            targetPage.classList.remove('hidden');
+            
+            // Close mobile menu if open
+            if (mobileMenu) {
+                mobileMenu.classList.add('hidden');
+            }
+            
+            // Special handling for Manage Data page
+            if (pageId === 'manageData') {
+                const adminLoginOverlay = document.getElementById('adminLoginOverlay');
+                const manageDataContent = document.getElementById('manageDataContent');
+                
+                if (!isAdminLoggedIn && adminLoginOverlay && manageDataContent) {
+                    adminLoginOverlay.classList.remove('hidden');
+                    manageDataContent.classList.add('hidden');
+                }
+            }
+            
+            // Special handling for Car Database page
+            if (pageId === 'carDatabase') {
+                setTimeout(populatePublicCarTable, 50);
+            }
+        }
+
+        calculatorLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('calculator');
+        });
+        
+        document.getElementById('carDatabaseLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('carDatabase');
+            populatePublicCarTable(); // Refresh the public car table
+        });
+
+        manageDataLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('manageData');
+        });
+
+        adjustmentRateLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('adjustmentRate');
+        });
+
+        mobileNavLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = link.dataset.target;
+                showPage(target);
+                if (target === 'carDatabase') {
+                    populatePublicCarTable();
+                }
+            });
+        });
+
+        // Format currency
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        // Populate car table
+        function populateCarTable() {
+            if (!carTableBody) return; // Exit if element isn't available
+            
+            carTableBody.innerHTML = '';
+            carData.forEach((car, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 border">${car.brand}</td>
+                    <td class="px-4 py-2 border">${car.detail}</td>
+                    <td class="px-4 py-2 border">${car.year}</td>
+                    <td class="px-4 py-2 border">${formatRupiah(car.price)}</td>
+                    <td class="px-4 py-2 border">
+                        <button class="text-red-600 hover:text-red-800 delete-btn" data-index="${index}">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                carTableBody.appendChild(row);
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    carData.splice(index, 1);
+                    populateCarTable();
+                    saveDataToLocalStorage(); // Save after deletion
+                });
+            });
+            
+            // Update car count in admin view
+            const totalCarsAdmin = document.getElementById('totalCarsAdmin');
+            if (totalCarsAdmin) {
+                totalCarsAdmin.textContent = `(${carData.length} cars)`;
+            }
+        }
+
+        // Auto-suggestions
+        function showSuggestions(input, suggestionsElement, property) {
+            const value = input.value.toLowerCase();
+            if (value.length < 1) {
+                suggestionsElement.classList.add('hidden');
+                return;
+            }
+
+            const suggestions = [...new Set(carData.map(car => car[property]))].filter(
+                item => item.toLowerCase().includes(value)
+            );
+
+            if (suggestions.length === 0) {
+                suggestionsElement.classList.add('hidden');
+                return;
+            }
+
+            suggestionsElement.innerHTML = '';
+            suggestions.forEach(suggestion => {
+                const div = document.createElement('div');
+                div.textContent = suggestion;
+                div.className = 'p-2 hover:bg-gray-100 cursor-pointer';
+                div.addEventListener('click', () => {
+                    input.value = suggestion;
+                    suggestionsElement.classList.add('hidden');
+                    
+                    // If brand is selected, filter detail suggestions
+                    if (property === 'brand') {
+                        detailInput.value = '';
+                        yearInput.value = '';
+                    }
+                    
+                    // If detail is selected, filter year suggestions and set brand
+                    if (property === 'detail') {
+                        const matchingCars = carData.filter(car => car.detail === suggestion);
+                        if (matchingCars.length > 0) {
+                            brandInput.value = matchingCars[0].brand;
+                            yearInput.value = '';
+                        }
+                    }
+                    
+                    // If year is selected, try to find exact match
+                    if (property === 'year') {
+                        const matchingCars = carData.filter(
+                            car => car.brand === brandInput.value && 
+                                  car.detail === detailInput.value && 
+                                  car.year === suggestion
+                        );
+                        if (matchingCars.length > 0) {
+                            // Found exact match
+                        }
+                    }
+                });
+                suggestionsElement.appendChild(div);
+            });
+            
+            suggestionsElement.classList.remove('hidden');
+        }
+
+        // Setup auto-suggestions
+        brandInput.addEventListener('input', () => {
+            showSuggestions(brandInput, brandSuggestions, 'brand');
+        });
+
+        detailInput.addEventListener('input', () => {
+            showSuggestions(detailInput, detailSuggestions, 'detail');
+        });
+
+        yearInput.addEventListener('input', () => {
+            showSuggestions(yearInput, yearSuggestions, 'year');
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!brandInput.contains(e.target) && !brandSuggestions.contains(e.target)) {
+                brandSuggestions.classList.add('hidden');
+            }
+            if (!detailInput.contains(e.target) && !detailSuggestions.contains(e.target)) {
+                detailSuggestions.classList.add('hidden');
+            }
+            if (!yearInput.contains(e.target) && !yearSuggestions.contains(e.target)) {
+                yearSuggestions.classList.add('hidden');
+            }
+        });
+
+        // Toggle estimation price input
+        const useEstimation = document.getElementById('useEstimation');
+        const estimationPriceContainer = document.getElementById('estimationPriceContainer');
+        
+        useEstimation.addEventListener('change', function() {
+            if (this.checked) {
+                estimationPriceContainer.classList.remove('hidden');
+            } else {
+                estimationPriceContainer.classList.add('hidden');
+                estimationPriceInput.value = '';
+            }
+        });
+        
+        // Calculate fee
+        calculateButton.addEventListener('click', () => {
+            const brand = brandInput.value;
+            const detail = detailInput.value;
+            const year = yearInput.value;
+            const useEstimationPrice = useEstimation.checked;
+            const estimationPrice = parseFloat(estimationPriceInput.value) || 0;
+            
+            // Find car in database
+            const car = carData.find(
+                car => car.brand === brand && car.detail === detail && car.year === year
+            );
+            
+            // Calculate database result
+            if (car) {
+                const price = car.price;
+                const fee = price * (feeRate / 100);
+                const reduction = fee * (conditionRate / 100);
+                const finalFee = fee - reduction;
+                
+                resultCar.textContent = `${car.brand} ${car.detail} (${car.year})`;
+                resultPrice.textContent = formatRupiah(price);
+                resultFeeRate.textContent = `${feeRate}%`;
+                resultConditionRate.textContent = `${conditionRate}%`;
+                resultFinalFee.textContent = formatRupiah(finalFee);
+            } else {
+                resultCar.textContent = 'Car not found in database';
+                resultPrice.textContent = '-';
+                resultFeeRate.textContent = '-';
+                resultConditionRate.textContent = '-';
+                resultFinalFee.textContent = '-';
+            }
+            
+            // Calculate estimation result
+            if (useEstimationPrice && estimationPrice > 0) {
+                const estFee = estimationPrice * (feeRate / 100);
+                const estReduction = estFee * (conditionRate / 100);
+                const estFinalFee = estFee - estReduction;
+                
+                estResultPrice.textContent = formatRupiah(estimationPrice);
+                estResultFeeRate.textContent = `${feeRate}%`;
+                estResultConditionRate.textContent = `${conditionRate}%`;
+                estResultFinalFee.textContent = formatRupiah(estFinalFee);
+                
+                estimationResult.classList.remove('hidden');
+            } else {
+                estimationResult.classList.add('hidden');
+            }
+        });
+
+        // Add new car
+        addCarButton.addEventListener('click', () => {
+            const brand = newBrand.value.trim();
+            const detail = newDetail.value.trim();
+            const year = newYear.value.trim();
+            const price = parseFloat(newPrice.value);
+            
+            if (!brand || !detail || !year || isNaN(price) || price <= 0) {
+                alert('Please fill all fields with valid values');
+                return;
+            }
+            
+            carData.push({ brand, detail, year, price });
+            populateCarTable();
+            
+            // Clear form
+            newBrand.value = '';
+            newDetail.value = '';
+            newYear.value = '';
+            newPrice.value = '';
+        });
+
+        // Import Excel data
+        importButton.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file to import');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: ['brand', 'detail', 'year', 'price'] });
+                
+                // Skip header row if exists
+                const startIndex = typeof jsonData[0].brand === 'string' && 
+                                  jsonData[0].brand.toLowerCase() === 'brand' ? 1 : 0;
+                
+                // Process data
+                const newData = [];
+                for (let i = startIndex; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (row.brand && row.detail && row.year && row.price) {
+                        newData.push({
+                            brand: String(row.brand),
+                            detail: String(row.detail),
+                            year: String(row.year),
+                            price: parseFloat(row.price)
+                        });
+                    }
+                }
+                
+                if (newData.length > 0) {
+                    carData = newData;
+                    populateCarTable();
+                    alert(`Successfully imported ${newData.length} car records`);
+                } else {
+                    alert('No valid data found in the file');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // Export to Excel
+        exportButton.addEventListener('click', () => {
+            const worksheet = XLSX.utils.json_to_sheet(carData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Car Data');
+            XLSX.writeFile(workbook, 'car_database.xlsx');
+        });
+
+        // Update fee rate
+        updateFeeRateButton.addEventListener('click', () => {
+            const newRate = parseFloat(newFeeRate.value);
+            const password = adminPassword.value;
+            
+            if (isNaN(newRate) || newRate < 0) {
+                alert('Please enter a valid fee rate');
+                return;
+            }
+            
+            if (password !== 'Kreditplus') {
+                alert('Invalid admin password');
+                return;
+            }
+            
+            feeRate = newRate;
+            currentFeeRate.textContent = `${feeRate}%`;
+            newFeeRate.value = '';
+            adminPassword.value = '';
+            alert('Fee rate updated successfully');
+        });
+
+        // Update condition rate
+        updateConditionRateButton.addEventListener('click', () => {
+            const newRate = parseFloat(newConditionRate.value);
+            const password = assetPassword.value;
+            
+            if (isNaN(newRate) || newRate < 0) {
+                alert('Please enter a valid condition rate');
+                return;
+            }
+            
+            if (password !== 'Asset') {
+                alert('Invalid asset management password');
+                return;
+            }
+            
+            conditionRate = newRate;
+            currentConditionRate.textContent = `${conditionRate}%`;
+            newConditionRate.value = '';
+            assetPassword.value = '';
+            alert('Condition rate updated successfully');
+        });
+
+        // Save data to localStorage
+        function saveDataToLocalStorage() {
+            localStorage.setItem('carData', JSON.stringify(carData));
+            localStorage.setItem('feeRate', feeRate);
+            localStorage.setItem('conditionRate', conditionRate);
+        }
+        
+        // Load data from localStorage
+        function loadDataFromLocalStorage() {
+            const savedCarData = localStorage.getItem('carData');
+            const savedFeeRate = localStorage.getItem('feeRate');
+            const savedConditionRate = localStorage.getItem('conditionRate');
+            
+            if (savedCarData) {
+                carData = JSON.parse(savedCarData);
+            }
+            
+            if (savedFeeRate) {
+                feeRate = parseFloat(savedFeeRate);
+            }
+            
+            if (savedConditionRate) {
+                conditionRate = parseFloat(savedConditionRate);
+            }
+        }
+        
+        // Update event listeners to save data
+        addCarButton.addEventListener('click', function() {
+            // Original code remains
+            saveDataToLocalStorage();
+        });
+        
+        updateFeeRateButton.addEventListener('click', function() {
+            // After updating fee rate
+            saveDataToLocalStorage();
+        });
+        
+        updateConditionRateButton.addEventListener('click', function() {
+            // After updating condition rate
+            saveDataToLocalStorage();
+        });
+        
+        // Car Database Page Elements - defined later with proper scoping
+        
+        // Admin login state
+        let isAdminLoggedIn = false;
+        
+        // Admin login elements
+        const adminLoginOverlay = document.getElementById('adminLoginOverlay');
+        const adminLoginPassword = document.getElementById('adminLoginPassword');
+        const adminLoginButton = document.getElementById('adminLoginButton');
+        const adminLoginCancelButton = document.getElementById('adminLoginCancelButton');
+        const manageDataContent = document.getElementById('manageDataContent');
+        
+        // Admin login button click
+        adminLoginButton.addEventListener('click', () => {
+            const password = adminLoginPassword.value;
+            if (password === 'Kreditplus') {
+                isAdminLoggedIn = true;
+                adminLoginOverlay.classList.add('hidden');
+                manageDataContent.classList.remove('hidden');
+                populateCarTable(); // Refresh the admin car table
+            } else {
+                alert('Invalid password. Please try again.');
+                adminLoginPassword.value = '';
+                adminLoginPassword.focus();
+            }
+        });
+        
+        // Admin login cancel button click
+        adminLoginCancelButton.addEventListener('click', () => {
+            adminLoginPassword.value = '';
+            showPage('calculator');
+        });
+        
+        // Admin login on enter key
+        adminLoginPassword.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                adminLoginButton.click();
+            }
+        });
+        
+        // Car Database Page Elements - defined later with proper scoping
+        
+        // Populate public car table with filters
+        function populatePublicCarTable() {
+            const publicCarTableBody = document.getElementById('publicCarTableBody');
+            const noResultsMessage = document.getElementById('noResultsMessage');
+            const totalCarsPublic = document.getElementById('totalCarsPublic');
+            const totalCarsAdmin = document.getElementById('totalCarsAdmin');
+            const filterBrand = document.getElementById('filterBrand');
+            const filterDetail = document.getElementById('filterDetail');
+            const filterYear = document.getElementById('filterYear');
+            
+            if (!publicCarTableBody) return; // Exit if elements aren't loaded yet
+            
+            const brandFilter = filterBrand ? filterBrand.value.toLowerCase() : '';
+            const detailFilter = filterDetail ? filterDetail.value.toLowerCase() : '';
+            const yearFilter = filterYear ? filterYear.value.toLowerCase() : '';
+            
+            const filteredCars = carData.filter(car => {
+                return (brandFilter === '' || car.brand.toLowerCase().includes(brandFilter)) &&
+                       (detailFilter === '' || car.detail.toLowerCase().includes(detailFilter)) &&
+                       (yearFilter === '' || car.year.toLowerCase().includes(yearFilter));
+            });
+            
+            publicCarTableBody.innerHTML = '';
+            
+            if (filteredCars.length === 0) {
+                if (noResultsMessage) noResultsMessage.classList.remove('hidden');
+            } else {
+                if (noResultsMessage) noResultsMessage.classList.add('hidden');
+                
+                filteredCars.forEach(car => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-4 py-2 border">${car.brand}</td>
+                        <td class="px-4 py-2 border">${car.detail}</td>
+                        <td class="px-4 py-2 border">${car.year}</td>
+                        <td class="px-4 py-2 border">${formatRupiah(car.price)}</td>
+                    `;
+                    publicCarTableBody.appendChild(row);
+                });
+            }
+            
+            // Update car counts
+            if (totalCarsPublic) totalCarsPublic.textContent = `(${filteredCars.length} cars)`;
+            if (totalCarsAdmin) totalCarsAdmin.textContent = `(${carData.length} cars)`;
+        }
+        
+        // Add event listeners for filters
+        document.getElementById('carDatabaseLink').addEventListener('click', () => {
+            setTimeout(() => {
+                const filterBrand = document.getElementById('filterBrand');
+                const filterDetail = document.getElementById('filterDetail');
+                const filterYear = document.getElementById('filterYear');
+                const resetFilterButton = document.getElementById('resetFilterButton');
+                
+                if (filterBrand) {
+                    filterBrand.addEventListener('input', populatePublicCarTable);
+                }
+                
+                if (filterDetail) {
+                    filterDetail.addEventListener('input', populatePublicCarTable);
+                }
+                
+                if (filterYear) {
+                    filterYear.addEventListener('input', populatePublicCarTable);
+                }
+                
+                if (resetFilterButton) {
+                    resetFilterButton.addEventListener('click', () => {
+                        if (filterBrand) filterBrand.value = '';
+                        if (filterDetail) filterDetail.value = '';
+                        if (filterYear) filterYear.value = '';
+                        populatePublicCarTable();
+                    });
+                }
+                
+                populatePublicCarTable();
+            }, 100);
+        });
+        
+        // Update populateCarTable to also update the car count
+        const originalPopulateCarTable = populateCarTable;
+        populateCarTable = function() {
+            originalPopulateCarTable();
+            populatePublicCarTable();
+        };
+        
+        // Initialize when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataFromLocalStorage();
+            populateCarTable();
+            
+            if (currentFeeRate) currentFeeRate.textContent = `${feeRate}%`;
+            if (currentConditionRate) currentConditionRate.textContent = `${conditionRate}%`;
+            
+            // Show calculator page by default
+            showPage('calculator');
+        });
+        
+        // Create service worker file content
+        function createServiceWorkerFile() {
+            const swContent = `
+                // Service Worker for Collection Inventory Fee Calculator
+                const CACHE_NAME = 'collection-inventory-fee-calculator-v1';
+                const urlsToCache = [
+                    '/',
+                    '/index.html',
+                    'https://cdn.tailwindcss.com',
+                    'https://unpkg.com/xlsx/dist/xlsx.full.min.js'
+                ];
+                
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                return cache.addAll(urlsToCache);
+                            })
+                    );
+                });
+                
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                if (response) {
+                                    return response;
+                                }
+                                return fetch(event.request);
+                            })
+                    );
+                });
+            `;
+            
+            // Create a Blob with the service worker content
+            const blob = new Blob([swContent], { type: 'application/javascript' });
+            
+            // Create a download link for the service worker file
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'sw.js';
+            
+            // Add a note about the service worker file
+            const note = document.createElement('div');
+            note.className = 'mt-4 p-4 bg-yellow-100 rounded-lg text-sm';
+            note.innerHTML = `
+                <p class="font-bold">For offline functionality:</p>
+                <p>1. <a href="#" id="downloadSW" class="text-blue-600 underline">Download the service worker file</a></p>
+                <p>2. Save it as "sw.js" in the same directory as your HTML file</p>
+            `;
+            
+            document.querySelector('footer > div').appendChild(note);
+            
+            // Add click event to download link
+            document.getElementById('downloadSW').addEventListener('click', function(e) {
+                e.preventDefault();
+                a.click();
+            });
+        }
+        
+        // Call the function to create the service worker file
+        createServiceWorkerFile();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'95fdd962e2b43e07',t:'MTc1MjYzMDYzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
