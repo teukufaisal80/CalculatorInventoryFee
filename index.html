@@ -1089,11 +1089,6 @@ newData.push({
         });
         
         // Update populateCarTable to also update the car count
-        const originalPopulateCarTable = populateCarTable;
-        populateCarTable = function() {
-            originalPopulateCarTable();
-            populatePublicCarTable();
-        };
         
         
 function loadCars() {
@@ -1110,8 +1105,13 @@ function loadCars() {
 
 // Initialize when DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-            loadDataFromLocalStorage();
-            populateCarTable();
+    loadDataFromLocalStorage();
+    try {
+        loadCars();
+    } catch (e) {
+        console.error("loadCars() failed", e);
+    }
+    populateCarTable();
             
             if (currentFeeRate) currentFeeRate.textContent = `${feeRate}%`;
             if (currentConditionRate) currentConditionRate.textContent = `${conditionRate}%`;
