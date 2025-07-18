@@ -1,5 +1,3 @@
-// script.js (full functionality, SheetDB-only, no localStorage)
-
 let carData = [];
 let feeRate = 5;
 let conditionRate = 10;
@@ -21,7 +19,7 @@ function setupNavigation() {
   document.getElementById('manageDataLink').onclick = e => { e.preventDefault(); showPage('manageData'); };
   document.getElementById('adjustmentRateLink').onclick = e => { e.preventDefault(); showPage('adjustmentRate'); };
 
-  document.getElementById('mobileMenuButton').addEventListener('click', () => {
+  document.getElementById('mobileMenuButton')?.addEventListener('click', () => {
     document.getElementById('mobileMenu').classList.toggle('hidden');
   });
 
@@ -33,17 +31,19 @@ function setupNavigation() {
       if (target === 'carDatabase') populatePublicCarTable();
     });
   });
+
+  ['filterBrand', 'filterDetail', 'filterYear'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input', populatePublicCarTable);
+  });
 }
 
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
   document.getElementById(pageId).classList.remove('hidden');
 
-  if (pageId === 'manageData') {
-    if (!isAdminLoggedIn) {
-      document.getElementById('adminLoginOverlay').classList.remove('hidden');
-      document.getElementById('manageDataContent').classList.add('hidden');
-    }
+  if (pageId === 'manageData' && !isAdminLoggedIn) {
+    document.getElementById('adminLoginOverlay').classList.remove('hidden');
+    document.getElementById('manageDataContent').classList.add('hidden');
   }
 }
 
@@ -63,7 +63,7 @@ function populateCarTable() {
   if (!tbody) return;
 
   tbody.innerHTML = '';
-  carData.forEach((car, index) => {
+  carData.forEach((car) => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td class="px-4 py-2 border">${car.brand}</td>
@@ -88,16 +88,13 @@ function populateCarTable() {
     };
   });
 
-  const count = document.getElementById('totalCarsAdmin');
-  if (count) count.textContent = `(${carData.length} cars)`;
+  document.getElementById('totalCarsAdmin').textContent = `(${carData.length} cars)`;
 }
 
 function populatePublicCarTable() {
   const tbody = document.getElementById('publicCarTableBody');
   const msg = document.getElementById('noResultsMessage');
   const count = document.getElementById('totalCarsPublic');
-
-  if (!tbody) return;
 
   const fBrand = document.getElementById('filterBrand')?.value.toLowerCase() || '';
   const fDetail = document.getElementById('filterDetail')?.value.toLowerCase() || '';
@@ -112,9 +109,9 @@ function populatePublicCarTable() {
   tbody.innerHTML = '';
 
   if (filtered.length === 0) {
-    msg?.classList.remove('hidden');
+    msg.classList.remove('hidden');
   } else {
-    msg?.classList.add('hidden');
+    msg.classList.add('hidden');
     filtered.forEach(car => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -125,7 +122,7 @@ function populatePublicCarTable() {
     });
   }
 
-  if (count) count.textContent = `(${filtered.length} cars)`;
+  count.textContent = `(${filtered.length} cars)`;
 }
 
 function setupCalculator() {
@@ -165,10 +162,6 @@ function setupCalculator() {
   });
 }
 
-function formatRupiah(num) {
-  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
-}
-
 function setupAdminLogin() {
   document.getElementById('adminLoginButton')?.addEventListener('click', () => {
     const pass = document.getElementById('adminLoginPassword').value;
@@ -206,6 +199,16 @@ function setupManageData() {
       loadCars();
     });
   });
+
+  document.getElementById('deleteAllCarsButton')?.addEventListener('click', () => {
+    if (confirm("Delete ALL cars? This cannot be undone.")) {
+      carData.forEach(car => {
+        fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/ID/${car.ID}?sheet=car_database`, { method: 'DELETE' });
+      });
+      alert("All cars deleted.");
+      setTimeout(loadCars, 1000);
+    }
+  });
 }
 
 function setupAdjustmentRate() {
@@ -225,7 +228,11 @@ function setupAdjustmentRate() {
     if (pass === 'Asset' && !isNaN(rate)) {
       conditionRate = rate;
       document.getElementById('currentConditionRate').textContent = `${conditionRate}%`;
-      alert('Taxation rate updated');
+      alert('Condition rate updated');
     } else alert('Invalid input');
   });
+}
+
+function formatRupiah(num) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
 }
