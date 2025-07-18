@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,9 +22,7 @@ function deleteAllCars() {
             });
             Promise.all(deletions).then(() => {
                 alert("✅ All car data deleted from SheetDB.");
-                carData = [];
-                populateCarTable();
-                saveDataToLocalStorage();
+                loadCars(); // Reload after deletion
             });
         });
 }
@@ -614,12 +613,24 @@ function deleteAllCars() {
             });
 
             // Add event listeners to delete buttons
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.dataset.index);
-                    carData.splice(index, 1);
-                    populateCarTable();
-                    saveDataToLocalStorage(); // Save after deletion
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const index = parseInt(this.dataset.index);
+        const car = carData[index];
+        if (!car || !car.ID) {
+            alert("Car ID not found.");
+            return;
+        }
+        if (!confirm(`Are you sure you want to delete ${car.brand} ${car.detail} (${car.year})?`)) return;
+
+        fetch(`https://sheetdb.io/api/v1/4z82od6vxzz7h/ID/${car.ID}?sheet=car_database`, {
+            method: 'DELETE'
+        }).then(() => {
+            alert("✅ Car deleted from SheetDB!");
+            loadCars(); // Refresh table
+        });
+    });
+}); // Save after deletion
                 });
             });
             
@@ -779,26 +790,42 @@ function deleteAllCars() {
         });
 
         // Add new car
-        addCarButton.addEventListener('click', () => {
-            const brand = newBrand.value.trim();
-            const detail = newDetail.value.trim();
-            const year = newYear.value.trim();
-            const price = parseFloat(newPrice.value);
-            
-            if (!brand || !detail || !year || isNaN(price) || price <= 0) {
-                alert('Please fill all fields with valid values');
-                return;
-            }
-            
-            carData.push({ brand, detail, year, price });
-            populateCarTable();
-            
-            // Clear form
-            newBrand.value = '';
-            newDetail.value = '';
-            newYear.value = '';
-            newPrice.value = '';
-        });
+        
+addCarButton.addEventListener('click', () => {
+    const brand = newBrand.value.trim();
+    const detail = newDetail.value.trim();
+    const year = newYear.value.trim();
+    const price = parseFloat(newPrice.value);
+
+    if (!brand || !detail || !year || isNaN(price) || price <= 0) {
+        alert('Please fill all fields with valid values');
+        return;
+    }
+
+    const car = {
+        ID: Date.now().toString(),
+        brand,
+        detail,
+        year,
+        price
+    };
+
+    fetch("https://sheetdb.io/api/v1/4z82od6vxzz7h?sheet=car_database", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [car] })
+    }).then(() => {
+        alert("✅ Car added to SheetDB!");
+        loadCars(); // Refresh table
+    });
+
+    // Clear form fields
+    newBrand.value = '';
+    newDetail.value = '';
+    newYear.value = '';
+    newPrice.value = '';
+});
+);
 
         // Import Excel data
         importButton.addEventListener('click', () => {
@@ -824,12 +851,15 @@ function deleteAllCars() {
                 for (let i = startIndex; i < jsonData.length; i++) {
                     const row = jsonData[i];
                     if (row.brand && row.detail && row.year && row.price) {
-                        newData.push({
-                            brand: String(row.brand),
-                            detail: String(row.detail),
-                            year: String(row.year),
-                            price: parseFloat(row.price)
-                        });
+                        
+newData.push({
+    ID: Date.now().toString(),
+    brand: String(row.brand),
+    detail: String(row.detail),
+    year: String(row.year),
+    price: parseFloat(row.price)
+});
+
                     }
                 }
                 
@@ -1065,7 +1095,20 @@ function deleteAllCars() {
             populatePublicCarTable();
         };
         
-        // Initialize when DOM is fully loaded
+        
+function loadCars() {
+    fetch("https://sheetdb.io/api/v1/4z82od6vxzz7h?sheet=car_database")
+        .then(res => res.json())
+        .then(data => {
+            carData = data;
+            populateCarTable();
+            populatePublicCarTable();
+            saveDataToLocalStorage();
+        });
+}
+
+
+// Initialize when DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
             loadDataFromLocalStorage();
             populateCarTable();
