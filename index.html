@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -927,23 +928,8 @@ newData.push({
         });
 
         // Save data to localStorage
-        function saveDataToLocalStorage() {
-            localStorage.setItem('carData', JSON.stringify(carData));
-            localStorage.setItem('feeRate', feeRate);
-            localStorage.setItem('conditionRate', conditionRate);
-        }
-        
         // Load data from localStorage
-        function loadDataFromLocalStorage() {
-            const savedCarData = localStorage.getItem('carData');
-            const savedFeeRate = localStorage.getItem('feeRate');
-            const savedConditionRate = localStorage.getItem('conditionRate');
-            
-            if (savedCarData) {
-                carData = JSON.parse(savedCarData);
-            }
-            
-            if (savedFeeRate) {
+        if (savedFeeRate) {
                 feeRate = parseFloat(savedFeeRate);
             }
             
@@ -955,18 +941,15 @@ newData.push({
         // Update event listeners to save data
         addCarButton.addEventListener('click', function() {
             // Original code remains
-            saveDataToLocalStorage();
-        });
+            });
         
         updateFeeRateButton.addEventListener('click', function() {
             // After updating fee rate
-            saveDataToLocalStorage();
-        });
+            });
         
         updateConditionRateButton.addEventListener('click', function() {
             // After updating condition rate
-            saveDataToLocalStorage();
-        });
+            });
         
         // Car Database Page Elements - defined later with proper scoping
         
@@ -1098,26 +1081,29 @@ function loadCars() {
             carData = data;
             populateCarTable();
             populatePublicCarTable();
-            saveDataToLocalStorage();
-        });
+            });
 }
 
 
+
+async function loadCarsFromSheetDB() {
+    try {
+        const res = await fetch("https://sheetdb.io/api/v1/4z82od6vxzz7h?sheet=car_database");
+        const data = await res.json();
+        carData = data;
+        populateCarTable();
+        populatePublicCarTable();
+    } catch (error) {
+        console.error("Failed to load car data from SheetDB:", error);
+    }
+}
+
 // Initialize when DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-    loadDataFromLocalStorage();
-    try {
-        loadCars();
-    } catch (e) {
-        console.error("loadCars() failed", e);
-    }
-    populateCarTable();
-            
-            if (currentFeeRate) currentFeeRate.textContent = `${feeRate}%`;
-            if (currentConditionRate) currentConditionRate.textContent = `${conditionRate}%`;
-            
-            // Show calculator page by default
-            showPage('calculator');
+    loadCarsFromSheetDB();
+    if (currentFeeRate) currentFeeRate.textContent = `${feeRate}%`;
+    if (currentConditionRate) currentConditionRate.textContent = `${conditionRate}%`;
+    showPage('calculator');
         });
         
         // Create service worker file content
